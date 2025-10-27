@@ -8,8 +8,7 @@ Welcome to the central repository for data quality check (QC) scripts. This repo
 
 ### 1\. Prerequisites
 
-* **Python 3**
-* **Google Colab**
+* **Python 3** or **Google Colab**
 
 ### 2\. How to Run the Script
 
