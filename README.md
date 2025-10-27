@@ -43,11 +43,11 @@ Each script is pre-configured with placeholder variables. You **MUST** update th
 
 This repository contains the following quality check scripts:
 
-| Script Filename | Program Area | Description |
+| Script Filename | Report | Description |
 | :--- | :--- | :--- |
 | **`qc_radet.py`** | RADET Data | Performs Quality checks specific to RADET report. |
 | **`qc_hts.py`** | HTS Data | Performs Quality checks specific to HIV Testing Services (HTS) report. |
-| **`qc_pmtct_hts.py`** | PMTCT Data | Performs Quality checks specific to Prevention of Mother-to-Child Transmission (PMTCT) report. |
+| **`qc_pmtct_hts.py`** | PMTCT_HTS Data | Performs Quality checks specific to Prevention of Mother-to-Child Transmission (PMTCT) report. |
 
 -----
 
