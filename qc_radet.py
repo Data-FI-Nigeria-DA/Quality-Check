@@ -300,7 +300,7 @@ def is_invalid_viralload(value):
         r"<20",
         r"failed",
         r"\d{1,3}(,\d{3})+",
-        r"Failed,TwiceREPEATSAMPLECOLLECTION|InvalidFailedtwice,REPEATSAMPLECOLLECTION|Invalid,FailedTwiceREPEATSAMPLECOLLECTION|Failedthreetimes,REPEATSAMPLECOLLECTION|Invalid,TwiceREPEATSAMPLECOLLECTION|Failedtwice,REPEATSAMPLECOLLECTION|Invalid,REPEATSAMPLECOLLECTION|Failed,REPEATSAMPLECOLLECTION|InvalidTwiceREPEATSAMPLECOLLECTION|FailedthreetimesREPEATSAMPLECOLLECTION|FailedTwiceREPEATSAMPLECOLLECTION|InvalidFailedtwiceREPEATSAMPLECOLLECTION|REPEAT SAMPLE COLLECTION|Invalid format|Invalidformat"
+        r"Failed,TwiceREPEATSAMPLECOLLECTION|InvalidFailedTwiceREPEATSAMPLECOLLECTION|InvalidFailedtwice,REPEATSAMPLECOLLECTION|Invalid,FailedTwiceREPEATSAMPLECOLLECTION|Failedthreetimes,REPEATSAMPLECOLLECTION|Invalid,TwiceREPEATSAMPLECOLLECTION|Failedtwice,REPEATSAMPLECOLLECTION|Invalid,REPEATSAMPLECOLLECTION|Failed,REPEATSAMPLECOLLECTION|InvalidTwiceREPEATSAMPLECOLLECTION|FailedthreetimesREPEATSAMPLECOLLECTION|FailedTwiceREPEATSAMPLECOLLECTION|InvalidFailedtwiceREPEATSAMPLECOLLECTION|REPEAT SAMPLE COLLECTION|Invalid format|Invalidformat"
     ]
     
     # Check if the value matches any valid pattern
@@ -798,4 +798,5 @@ for project_name in combined_data['ProjectName'].unique():
         all_line_lists_df.to_excel(writer, sheet_name='Quality Issues Line List', index=False)
 
     print(f"Quality check for project '{project_name}' saved to: {output_file_path}") 
+
 
