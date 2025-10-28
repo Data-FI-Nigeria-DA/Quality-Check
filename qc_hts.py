@@ -5,11 +5,15 @@ from datetime import datetime
 folder_path ='C:/Users/oluwabukola.arowolo/OneDrive - Palladium International, LLC/Documents/DataFi/FY26Q1_RADET/NEW'
 
 output_base_dir = 'C:/Users/oluwabukola.arowolo/OneDrive - Palladium International, LLC/Documents/DataFi/HTS_Project_Export_Quality_Check'
+
+#Defining Periods
+filter_date = datetime(1900, 1, 1)
+
 os.makedirs(output_base_dir, exist_ok=True)
 
 all_files = [os.path.join(folder_path,f) for f in os.listdir(folder_path) if f.endswith(('csv','xlsx','.xls'))]
 
-filter_date = datetime(1900, 1, 1)
+
 
 # Combine all files into one DataFrame
 combined_data = pd.DataFrame()
@@ -39,8 +43,8 @@ combined_data['ProjectName'] = combined_data['Filename'].str.split('_').str[0]
 
 #convert each date column to date
 for col in ['Date Of Birth (yyyy-mm-dd)', 'Date of Visit (yyyy-mm-dd)', 'Date Of HIV Testing (yyyy-mm-dd)', 
-            'Recency Test Date (yyyy-mm-dd)', 'Viral Load Sample Collection Date', 
-            'Recency Test Date (yyyy-mm-dd)', 'Viral Load Confirmation Date (yyyy-mm-dd)']: #'Recency Viral Load Result Received Date (yyyy-mm-dd)'
+            'Recency Test Date (yyyy-mm-dd)', 'Recency Viral Load Sample Collection Date', 
+            'Recency Test Date (yyyy-mm-dd)', 'Recency Viral Load Result Received Date (yyyy-mm-dd)']: #'Recency Viral Load Result Received Date (yyyy-mm-dd)'
     combined_data[col] = pd.to_datetime(combined_data[col], errors='coerce')
 
 quality_issue_counts = []
@@ -157,14 +161,7 @@ for project_name in combined_data['ProjectName'].unique():
     blank_Counseling_Type['Quality_Issue'] = 'blank Counseling Type'
     all_line_lists_data.append(blank_Counseling_Type)
 
-    #blank Assessment code
-    blank_Assessment_code = project_data[
-        (project_data['Assessment Code'].isna()) &
-        (project_data['Date Of HIV Testing (yyyy-mm-dd)'] >= filter_date)
-    ]
-    project_issues['blank_Assessment_code'] = blank_Assessment_code.shape[0]
-    blank_Assessment_code['Quality_Issue'] = 'blank Assessment code'
-    all_line_lists_data.append(blank_Assessment_code)
+    
 
     #blank Syphilis Test Result for pregnant women
     blank_Syphilis_Test_Result_for_pregnant_women = project_data[
@@ -172,7 +169,7 @@ for project_name in combined_data['ProjectName'].unique():
         (project_data['Date Of HIV Testing (yyyy-mm-dd)'] >= filter_date) &
         (project_data['Sex'] == 'Female') &
         (project_data['Age'] >=15) &
-        (project_data['Pregnancy Status'] == 'Pregnant')
+        (project_data['Pregnancy/Breastfeeding Status'] == 'Pregnant')
     ]
     project_issues['blank_Syphilis_Test_Result_for_pregnant_women'] = blank_Syphilis_Test_Result_for_pregnant_women.shape[0]
     blank_Syphilis_Test_Result_for_pregnant_women['Quality_Issue'] = 'blank Syphilis Test Result for pregnant women'
@@ -227,26 +224,17 @@ for project_name in combined_data['ProjectName'].unique():
 
     #Viral Load Confirmation Date < Viral Load Sample Collection Date
     Viral_Load_Confirmation_Date_is_earlier_than_Viral_Load_Sample_Collection_Date = project_data[
-        (project_data['Viral Load Confirmation Date (yyyy-mm-dd)'] < project_data['Viral Load Sample Collection Date']) & 
+        (project_data['Recency Viral Load Result Received Date (yyyy-mm-dd)'] < project_data['Recency Viral Load Sample Collection Date']) & 
         (project_data['Date Of HIV Testing (yyyy-mm-dd)'] >= filter_date)
     ]
     project_issues['Viral_Load_Confirmation_Date_is_earlier_than_Recency_Viral_Load_Result_Received_Date'] = Viral_Load_Confirmation_Date_is_earlier_than_Viral_Load_Sample_Collection_Date.shape[0]
     Viral_Load_Confirmation_Date_is_earlier_than_Viral_Load_Sample_Collection_Date['Quality_Issue'] = 'Viral Load Confirmation Date is earlier than Viral Load Sample Collection Date'
     all_line_lists_data.append(Viral_Load_Confirmation_Date_is_earlier_than_Viral_Load_Sample_Collection_Date)
 
-    #Latest HTS Date is earlier than Date of HIV Testing
-    Latest_HTS_Date_is_earlier_than_Date_of_HIV_Testing = project_data[
-        (project_data['Latest HTS Date'] < project_data['Date Of HIV Testing (yyyy-mm-dd)']) & 
-        (project_data['Date Of HIV Testing (yyyy-mm-dd)'] >= filter_date)
-    ]
-    project_issues['Latest_HTS_Date_is_earlier_than_Date_of_HIV_Testing'] = Latest_HTS_Date_is_earlier_than_Date_of_HIV_Testing.shape[0]
-    Latest_HTS_Date_is_earlier_than_Date_of_HIV_Testing['Quality_Issue'] = 'Latest HTS Date is earlier than Date of HIV Testing'
-    all_line_lists_data.append(Latest_HTS_Date_is_earlier_than_Date_of_HIV_Testing)
-
-
+    
     #Date of HIV Testing is greater than Viral Load Confirmation Date
     Date_Of_HIV_Testing_is_greater_than_Viral_Load_Confirmation_Date = project_data[
-        (project_data['Date Of HIV Testing (yyyy-mm-dd)'] > project_data['Viral Load Confirmation Date (yyyy-mm-dd)']) & 
+        (project_data['Date Of HIV Testing (yyyy-mm-dd)'] > project_data['Recency Viral Load Result Received Date (yyyy-mm-dd)']) & 
         (project_data['Date Of HIV Testing (yyyy-mm-dd)'] >= filter_date)
     ]
     project_issues['Date_Of_HIV_Testing_is_greater_than_Viral_Load_Confirmation_Date'] = Date_Of_HIV_Testing_is_greater_than_Viral_Load_Confirmation_Date.shape[0]
@@ -267,7 +255,7 @@ for project_name in combined_data['ProjectName'].unique():
     #Recency Interpretation equals RTRI Recent and Recency Viral Load Sample Collection Date or Recency Viral Load Confirmation Result or Recency Viral Load Result Received Date (yyyy-mm-dd) is blank
     Recency_Interpretation_equals_RTRI_Recent_and_VLSCDate_or_VLConfirmationDate_or_VLRRDate_is_blank = project_data[
         (project_data['Recency Interpretation'] == "RTRI Recent") &
-        ((project_data['Viral Load Sample Collection Date'].isna()) |(project_data['Viral Load Confirmation Result'].isna()) | (project_data['Viral Load Confirmation Date (yyyy-mm-dd)'].isna())) & 
+        ((project_data['Recency Viral Load Sample Collection Date'].isna()) |(project_data['Recency Viral Load Confirmation Result'].isna()) | (project_data['Recency Viral Load Result Received Date (yyyy-mm-dd)'].isna())) & 
         (project_data['Date Of HIV Testing (yyyy-mm-dd)'] >= filter_date)
     ]
     project_issues['Recency_Interpretation_equals_RTRI_Recent_and_VLSCDate_or_VLConfirmationDate_or_VLRRDate_is_blank'] = Recency_Interpretation_equals_RTRI_Recent_and_VLSCDate_or_VLConfirmationDate_or_VLRRDate_is_blank.shape[0]
@@ -338,25 +326,12 @@ for project_name in combined_data['ProjectName'].unique():
     blank_Pregnancy_Status_for_childbearing_Age_women = project_data[
         (project_data['Age'] >=15) &
         (project_data['Sex'] == 'Female') &
-        (project_data['Pregnancy Status'].isna()) & #Pregnancy/Breastfeeding Status
+        (project_data['Pregnancy/Breastfeeding Status'].isna()) & #Pregnancy/Breastfeeding Status
         (project_data['Date Of HIV Testing (yyyy-mm-dd)'] >= filter_date)
     ]
     project_issues['blank_Pregnancy_Status_for_childbearing_Age_women'] = blank_Pregnancy_Status_for_childbearing_Age_women.shape[0]
     blank_Pregnancy_Status_for_childbearing_Age_women['Quality_Issue'] = 'blank Pregnancy Status for childbearing Age women'
     all_line_lists_data.append(blank_Pregnancy_Status_for_childbearing_Age_women)
-
-
-    #blank Breastfeeding where pregnancy status is breastfeeding
-    blank_Breastfeeding_where_pregnancy_status_is_breastfeeding = project_data[
-        (project_data['Age'] >=15) &
-        (project_data['Sex'] == 'Female') &
-        (project_data['Pregnancy Status'] == "Breastfeeding") & #Pregnancy/Breastfeeding Status for client
-        (project_data['Breastfeeding'].isna()) &
-        (project_data['Date Of HIV Testing (yyyy-mm-dd)'] >= filter_date)
-    ]
-    project_issues['blank_Breastfeeding_where_pregnancy_status_is_breastfeeding'] = blank_Breastfeeding_where_pregnancy_status_is_breastfeeding.shape[0]
-    blank_Breastfeeding_where_pregnancy_status_is_breastfeeding['Quality_Issue'] = 'blank Breastfeeding where pregnancy status is breastfeeding'
-    all_line_lists_data.append(blank_Breastfeeding_where_pregnancy_status_is_breastfeeding)
 
 
     #wrong modality for Congergational setting
